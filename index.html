@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Provider and Games</title>
+    <style>
+        /* Add some basic styling for better visualization */
+        .line-item {
+            margin: 10px 0;
+        }
+
+        .circle {
+            border-radius: 50%;
+            overflow: hidden;
+            width: 120px;
+            height: 120px;
+            display: inline-block;
+            position: relative;
+        }
+
+        .image-container {
+            text-align: center;
+            position: relative;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+        }
+
+        .button-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+
+        .image-container:hover .button-container {
+            display: block;
+        }
+
+        .animated-button {
+            background-color: gold;
+            padding: 5px 10px;
+            color: black;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+
+        .image-container p {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <label for="providers">Select Provider:</label>
+    <select id="providers"></select>
+
+    <div id="games-list"></div>
+
+    <script>
+        // Function to populate the games list
+        function displayGames(games) {
+            const gamesListElement = document.getElementById('games-list');
+            gamesListElement.innerHTML = ''; // Clear previous games
+
+            games.forEach(game => {
+                const gameDiv = document.createElement('div');
+                gameDiv.className = 'line-item';
+
+                const circleDiv = document.createElement('div');
+                circleDiv.className = 'circle';
+
+                const imageContainerDiv = document.createElement('div');
+                imageContainerDiv.className = 'image-container';
+
+                const img = document.createElement('img');
+                img.src = game.image;
+                img.alt = game.name;
+
+                const buttonContainerDiv = document.createElement('div');
+                buttonContainerDiv.className = 'button-container';
+
+                const link = document.createElement('a');
+                link.href = `https://barba216.com/casino/${game.id}`;
+                link.className = 'animated-button';
+                link.textContent = 'PLAY';
+
+                const name = document.createElement('p');
+                name.style.color = 'gold';
+                name.style.fontWeight = 'bold';
+                name.textContent = game.name;
+
+                buttonContainerDiv.appendChild(link);
+                imageContainerDiv.appendChild(img);
+                imageContainerDiv.appendChild(buttonContainerDiv);
+                imageContainerDiv.appendChild(name);
+                circleDiv.appendChild(imageContainerDiv);
+                gameDiv.appendChild(circleDiv);
+
+                gamesListElement.appendChild(gameDiv);
+            });
+        }
+
+        // Function to populate the select menu
+        function populateSelectMenu(data) {
+            const selectElement = document.getElementById('providers');
+            data.providers.forEach((provider, index) => {
+                const option = document.createElement('option');
+                option.value = provider.name;
+                option.textContent = provider.name;
+
+                // Set the first provider as selected by default
+                if (index === 0) {
+                    option.selected = true;
+                    displayGames(provider.games); // Display games for the first provider
+                }
+
+                selectElement.appendChild(option);
+            });
+
+            // Event listener for select menu change
+            selectElement.addEventListener('change', function () {
+                const selectedProvider = data.providers.find(provider => provider.name === this.value);
+                displayGames(selectedProvider.games);
+            });
+        }
+
+        // Fetch the JSON data
+        fetch('games.json')
+            .then(response => response.json())
+            .then(data => {
+                populateSelectMenu(data);
+            })
+            .catch(error => {
+                console.error('Error loading JSON data:', error);
+            });
+    </script>
+</body>
+</html>
